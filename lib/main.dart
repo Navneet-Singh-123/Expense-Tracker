@@ -1,8 +1,9 @@
-import './widgets/transaction_list.dart';
 import 'package:flutter/material.dart';
+
 import './widgets/new_transaction.dart';
-import './models/transaction.dart';
+import './widgets/transaction_list.dart';
 import './widgets/chart.dart';
+import './models/transaction.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,10 +12,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Personal Expenses',
-      home: MyHomePage(),
       theme: ThemeData(
           primarySwatch: Colors.purple,
           accentColor: Colors.amber,
+          // errorColor: Colors.red,
           fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
                 title: TextStyle(
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
+                button: TextStyle(color: Colors.white),
               ),
           appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(
@@ -32,11 +34,14 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
           )),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  // String titleInput;
+  // String amountInput;
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -46,73 +51,88 @@ class _MyHomePageState extends State<MyHomePage> {
     // Transaction(
     //   id: 't1',
     //   title: 'New Shoes',
-    //   amount: 70,
+    //   amount: 69.99,
     //   date: DateTime.now(),
     // ),
     // Transaction(
     //   id: 't2',
     //   title: 'Weekly Groceries',
-    //   amount: 12.5,
+    //   amount: 16.53,
     //   date: DateTime.now(),
     // ),
   ];
 
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
-      return tx.date.isAfter(DateTime.now().subtract(Duration(days: 7)));
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
     }).toList();
   }
 
-  void _addNewTransaction(String title, double amount) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime chosenDate) {
     final newTx = Transaction(
-      title: title,
-      amount: amount,
-      date: DateTime.now(),
+      title: txTitle,
+      amount: txAmount,
+      date: chosenDate,
       id: DateTime.now().toString(),
     );
+
     setState(() {
       _userTransactions.add(newTx);
     });
   }
 
-  void _startAddNewTransacion(BuildContext ctx) {
+  void _startAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
       context: ctx,
       builder: (_) {
         return GestureDetector(
-          child: NewTransaction(_addNewTransaction),
           onTap: () {},
+          child: NewTransaction(_addNewTransaction),
           behavior: HitTestBehavior.opaque,
         );
       },
     );
   }
 
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((tx) => tx.id == id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Personal Expenses'),
+        title: Text(
+          'Personal Expenses',
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransacion(context),
+            onPressed: () => _startAddNewTransaction(context),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Chart(_recentTransactions),
-            TransactionList(_userTransactions),
+            TransactionList(_userTransactions, _deleteTransaction),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => _startAddNewTransacion(context),
+        onPressed: () => _startAddNewTransaction(context),
       ),
     );
   }

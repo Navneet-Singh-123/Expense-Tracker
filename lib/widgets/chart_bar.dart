@@ -1,12 +1,11 @@
-import 'package:expense_tracker/widgets/chart.dart';
 import 'package:flutter/material.dart';
 
 class ChartBar extends StatelessWidget {
   final String label;
   final double spendingAmount;
-  final double spendingPctOfAmount;
+  final double spendingPctOfTotal;
 
-  ChartBar(this.label, this.spendingAmount, this.spendingPctOfAmount);
+  ChartBar(this.label, this.spendingAmount, this.spendingPctOfTotal);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class ChartBar extends StatelessWidget {
         Container(
           height: 20,
           child: FittedBox(
-            child: Text('Rs${spendingAmount.toStringAsFixed(0)}'),
+            child: Text('\$${spendingAmount.toStringAsFixed(0)}'),
           ),
         ),
         SizedBox(
@@ -34,7 +33,7 @@ class ChartBar extends StatelessWidget {
                 ),
               ),
               FractionallySizedBox(
-                heightFactor: spendingPctOfAmount,
+                heightFactor: spendingPctOfTotal,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
